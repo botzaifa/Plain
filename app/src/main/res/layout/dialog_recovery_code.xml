@@ -1,0 +1,49 @@
+<?xml version="1.0" encoding="utf-8"?>
+<LinearLayout xmlns:android="http://schemas.android.com/apk/res/android"
+    android:layout_width="match_parent"
+    android:layout_height="wrap_content"
+    android:orientation="vertical"
+    android:padding="24dp">
+
+    <TextView
+        style="@style/PlainScreenTitle"
+        android:layout_width="match_parent"
+        android:layout_height="wrap_content"
+        android:text="@string/recovery_code_title"
+        android:textSize="22sp" />
+
+    <TextView
+        style="@style/PlainScreenSubtitle"
+        android:layout_width="match_parent"
+        android:layout_height="wrap_content"
+        android:paddingTop="8dp"
+        android:text="@string/recovery_code_hint" />
+
+    <TextView
+        android:id="@+id/codeDisplay"
+        android:layout_width="match_parent"
+        android:layout_height="wrap_content"
+        android:background="@drawable/bg_plain_input"
+        android:fontFamily="monospace"
+        android:gravity="center"
+        android:padding="16dp"
+        android:textColor="@color/plain_white"
+        android:textSize="22sp" />
+
+    <CheckBox
+        android:id="@+id/confirmWritten"
+        android:layout_width="match_parent"
+        android:layout_height="wrap_content"
+        android:layout_marginTop="16dp"
+        android:text="@string/i_wrote_it_down"
+        android:textColor="@color/plain_white" />
+
+    <Button
+        android:id="@+id/btnContinue"
+        style="@style/PlainButtonPrimary"
+        android:layout_width="match_parent"
+        android:layout_height="wrap_content"
+        android:layout_marginTop="16dp"
+        android:enabled="false"
+        android:text="@string/wizard_next" />
+</LinearLayout>

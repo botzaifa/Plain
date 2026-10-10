@@ -1,22 +1,12 @@
 package app.plain.launcher.fakes
 
-import java.time.Clock
-import java.time.Instant
-import java.time.ZoneId
+import app.plain.launcher.core.Clock
 
 class FakeClock(
-    private var instant: Instant,
-    private val zone: ZoneId = ZoneId.of("UTC"),
-) : Clock() {
-    override fun getZone(): ZoneId = zone
-    override fun withZone(zone: ZoneId?): Clock = FakeClock(instant, zone ?: this.zone)
-    override fun instant(): Instant = instant
+    var elapsed: Long = 0L,
+    var boot: Int? = 1,
+) : Clock {
+    override fun elapsedRealtime(): Long = elapsed
 
-    fun advanceSeconds(seconds: Long) {
-        instant = instant.plusSeconds(seconds)
-    }
-
-    fun setInstant(newInstant: Instant) {
-        instant = newInstant
-    }
+    override fun bootCount(): Int? = boot
 }

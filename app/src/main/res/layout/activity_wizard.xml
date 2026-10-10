@@ -1,0 +1,18 @@
+<?xml version="1.0" encoding="utf-8"?>
+<FrameLayout xmlns:android="http://schemas.android.com/apk/res/android"
+    android:layout_width="match_parent"
+    android:layout_height="match_parent"
+    android:background="@color/plain_black">
+
+    <ViewFlipper
+        android:id="@+id/flipper"
+        android:layout_width="match_parent"
+        android:layout_height="match_parent">
+
+        <include layout="@layout/wizard_welcome" />
+        <include layout="@layout/wizard_passwords" />
+        <include layout="@layout/wizard_recovery" />
+        <include layout="@layout/wizard_basic" />
+        <include layout="@layout/wizard_done" />
+    </ViewFlipper>
+</FrameLayout>

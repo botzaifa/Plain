@@ -1,10 +1,88 @@
 <?xml version="1.0" encoding="utf-8"?>
 <resources>
-    <style name="Theme.Plain" parent="android:Theme.DeviceDefault.NoActionBar">
-        <item name="android:windowBackground">@android:color/black</item>
-        <item name="android:statusBarColor">@android:color/transparent</item>
-        <item name="android:navigationBarColor">@android:color/transparent</item>
-        <item name="android:windowSplashScreenBackground">@android:color/black</item>
+    <style name="Theme.Plain" parent="@android:style/Theme.Material.NoActionBar">
+        <item name="android:windowBackground">@color/plain_black</item>
+        <item name="android:colorBackground">@color/plain_black</item>
+        <item name="android:statusBarColor">@color/plain_black</item>
+        <item name="android:navigationBarColor">@color/plain_black</item>
         <item name="android:windowLightStatusBar">false</item>
+        <item name="android:textColorPrimary">@color/plain_white</item>
+        <item name="android:textColorSecondary">@color/plain_gray</item>
+        <item name="android:buttonStyle">@style/PlainButtonPrimary</item>
     </style>
+
+    <style name="Theme.Plain.Dialog" parent="@android:style/Theme.Material.Dialog">
+        <item name="android:windowBackground">@drawable/bg_plain_panel</item>
+        <item name="android:textColorPrimary">@color/plain_white</item>
+        <item name="android:textColorSecondary">@color/plain_gray</item>
+    </style>
+
+    <style name="PlainScreenTitle">
+        <item name="android:textSize">26sp</item>
+        <item name="android:textColor">@color/plain_white</item>
+        <item name="android:fontFamily">sans-serif-medium</item>
+    </style>
+
+    <style name="PlainScreenSubtitle">
+        <item name="android:textSize">15sp</item>
+        <item name="android:textColor">@color/plain_gray</item>
+        <item name="android:lineSpacingExtra">4dp</item>
+    </style>
+
+    <style name="PlainSectionLabel">
+        <item name="android:textSize">13sp</item>
+        <item name="android:textColor">@color/plain_accent</item>
+        <item name="android:letterSpacing">0.08</item>
+        <item name="android:textAllCaps">true</item>
+        <item name="android:paddingTop">20dp</item>
+        <item name="android:paddingBottom">8dp</item>
+    </style>
+
+    <style name="PlainFieldHint">
+        <item name="android:textSize">12sp</item>
+        <item name="android:textColor">@color/plain_gray</item>
+        <item name="android:paddingBottom">6dp</item>
+    </style>
+
+    <style name="PlainEditText">
+        <item name="android:layout_width">match_parent</item>
+        <item name="android:layout_height">wrap_content</item>
+        <item name="android:minHeight">52dp</item>
+        <item name="android:paddingLeft">16dp</item>
+        <item name="android:paddingRight">16dp</item>
+        <item name="android:paddingTop">14dp</item>
+        <item name="android:paddingBottom">14dp</item>
+        <item name="android:background">@drawable/bg_plain_input</item>
+        <item name="android:textColor">@color/plain_white</item>
+        <item name="android:textColorHint">@color/plain_gray</item>
+        <item name="android:textSize">17sp</item>
+    </style>
+
+    <style name="PlainButtonPrimary" parent="@android:style/Widget.Material.Button">
+        <item name="android:minHeight">52dp</item>
+        <item name="android:paddingLeft">24dp</item>
+        <item name="android:paddingRight">24dp</item>
+        <item name="android:textAllCaps">false</item>
+        <item name="android:textSize">17sp</item>
+        <item name="android:textColor">@color/plain_black</item>
+        <item name="android:backgroundTint">@color/plain_white</item>
+    </style>
+
+    <style name="PlainButtonSecondary" parent="PlainButtonPrimary">
+        <item name="android:textColor">@color/plain_white</item>
+        <item name="android:backgroundTint">@color/plain_button_secondary</item>
+    </style>
+
+    <style name="PlainListButton" parent="PlainButtonSecondary">
+        <item name="android:gravity">start|center_vertical</item>
+        <item name="android:paddingStart">20dp</item>
+        <item name="android:layout_marginBottom">8dp</item>
+    </style>
+
+    <!-- Wizard aliases -->
+    <style name="WizardButton" parent="PlainButtonPrimary">
+        <item name="android:backgroundTint">@color/wizard_button_bg</item>
+        <item name="android:textColor">@color/wizard_button_text</item>
+    </style>
+    <style name="WizardButton.Secondary" parent="PlainButtonSecondary" />
 </resources>

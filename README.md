@@ -1,34 +1,40 @@
-# Plain
+# Plain v2
 
-Text-only Android launcher for intentional, tiered app access.
+Assistive-access Android launcher: large Basic app tiles on Home, everything else gated behind TEMP / FULL / ADMIN passwords, enforced by a minimal accessibility service.
 
-## Device
+## Requirements
 
-**Primary phone:** not connected during development. Run `adb shell getprop` when the physical device is available and update this section before M1 sign-off.
+- Android 7.0+ (API 24), tested toward API 37
+- Sideload the APK (not designed for Play accessibility policy)
+- After setup, set Plain as the default Home app and enable the Plain gate accessibility service when you are ready (Home banner and admin Settings; Android 13+ may require **App info → Allow restricted settings** first)
 
-**Emulator (dev builds):** SDK `37` (`37.1`), release `17`, Google `sdk_gphone16k_x86_64` (Oct 2026).
+## Recovery
 
-## Architecture
+1. **Recovery code** (12 characters, shown once during setup): resets **admin password only** at the Gated password prompt → Forgot password?
+2. **Last resort:** boot to safe mode, clear Plain app data (wipes all Plain settings).
 
-| Layer | Role |
-| --- | --- |
-| `apps/` | Discovery, slots, launch targets |
-| `data/` | Room, DataStore, repositories |
-| `home/`, `search/`, `gate/`, `settings/` | Compose screens |
-| `ui/` | Theme and optional glass |
+## Always allowed while locked
 
-## Honest scope
+Default dialer, default Clock/alarm app, apps that handle HOME (system recents / OEM launchers), keyboards, and Plain itself. Gated apps may flash briefly before Home is sent.
 
-Plain only nudges what you open through Home. Recents, notifications, and system Settings remain full escape hatches.
+## Known limits
 
-## Switch Home app back
+- Safe mode, adb, power menu / factory reset bypass Plain
+- Apps without launcher icons are not in the Gated list
+- Split screen and work profiles are unsupported
+- Anyone who knows a password can unlock; lockout slows guessing
+- Extra third-party HOME apps with launcher icons stay reachable from Recents (remove them if that matters)
+- OEM battery savers may kill the accessibility service; use dontkillmyapp.com guidance
 
-Settings → Apps → Default apps → Home app.
+## Build
 
-## Gate passes
+```bash
+./gradlew assembleDebug assembleRelease test
+```
 
-A successful pass means `LauncherApps.startMainActivity` returned without throwing, not that the target app finished opening.
+Release builds minify with R8. Debug builds may shorten TEMP duration via an internal override (not present in release).
 
-## Cold start
+## Docs
 
-TBD on minified release (`adb shell am start-activity -W -S` × 10).
+- [docs/qa.md](docs/qa.md) — device test results
+- [docs/api-notes.md](docs/api-notes.md) — API verification and allowlist evidence

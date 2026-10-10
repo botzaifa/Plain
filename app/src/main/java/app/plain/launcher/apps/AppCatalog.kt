@@ -1,61 +1,45 @@
 package app.plain.launcher.apps
 
+import android.content.Context
+import android.content.Intent
 import android.content.pm.LauncherApps
+import android.content.pm.PackageManager
+import android.os.Build
+import android.os.Handler
+import android.os.Looper
 import android.os.Process
 import android.os.UserHandle
-import kotlinx.coroutines.CoroutineScope
-import kotlinx.coroutines.flow.MutableStateFlow
-import kotlinx.coroutines.flow.StateFlow
-import kotlinx.coroutines.flow.asStateFlow
-import kotlinx.coroutines.launch
+import app.plain.launcher.BuildConfig
+import app.plain.launcher.core.Config
 
-class AppCatalog(
-    private val scope: CoroutineScope,
-    private val launcherApps: LauncherApps,
-    private val ownPackageName: String,
-    private val packagePresence: PackagePresence,
-    private val onPackageAdded: suspend (String) -> Unit,
-    private val onPackageRemoved: suspend (String) -> Unit,
-    private val onPackageChanged: suspend (String) -> Unit,
-    private val reconcileStoredPackages: suspend (Set<String>) -> Unit,
-) : AppCatalogReader {
-    private val user: UserHandle = Process.myUserHandle()
+class AppCatalog(context: Context) {
+    interface Listener {
+        fun onCatalogChanged()
+    }
 
-    private val _apps = MutableStateFlow<List<InstalledApp>>(emptyList())
-    override val apps: StateFlow<List<InstalledApp>> = _apps.asStateFlow()
-
-    private var callbackRegistered = false
+    private val appContext = context.applicationContext
+    private val launcherApps = appContext.getSystemService(LauncherApps::class.java)
+    private val packageManager = appContext.packageManager
+    private val mainHandler = Handler(Looper.getMainLooper())
+    private val listeners = mutableSetOf<Listener>()
+    private var entries: List<AppEntry> = emptyList()
 
     private val callback =
         object : LauncherApps.Callback() {
+            override fun onPackageRemoved(packageName: String, user: UserHandle) {
+                mainHandler.postDelayed({
+                    if (launcherApps?.getActivityList(packageName, user).isNullOrEmpty()) {
+                        refresh()
+                    }
+                }, Config.PACKAGE_ABSENCE_DELAY_MS)
+            }
+
             override fun onPackageAdded(packageName: String, user: UserHandle) {
-                if (user != Process.myUserHandle()) return
-                if (packageName == ownPackageName) return
-                refreshPackage(packageName)
-                scope.launch { onPackageAdded(packageName) }
+                refresh()
             }
 
             override fun onPackageChanged(packageName: String, user: UserHandle) {
-                if (user != Process.myUserHandle()) return
-                if (packageName == ownPackageName) return
-                refreshPackage(packageName)
-                scope.launch { onPackageChanged(packageName) }
-            }
-
-            override fun onPackageRemoved(packageName: String, user: UserHandle) {
-                if (user != Process.myUserHandle()) return
-                if (packageName == ownPackageName) return
-                removePackage(packageName)
-                scope.launch { onPackageRemoved(packageName) }
-            }
-
-            override fun onPackagesUnavailable(
-                packageNames: Array<out String>,
-                user: UserHandle,
-                replacing: Boolean,
-            ) {
-                if (user != Process.myUserHandle()) return
-                markUnavailable(packageNames.toSet(), unavailable = true)
+                refresh()
             }
 
             override fun onPackagesAvailable(
@@ -63,83 +47,98 @@ class AppCatalog(
                 user: UserHandle,
                 replacing: Boolean,
             ) {
-                if (user != Process.myUserHandle()) return
-                markUnavailable(packageNames.toSet(), unavailable = false)
+                refresh()
+            }
+
+            override fun onPackagesUnavailable(
+                packageNames: Array<out String>,
+                user: UserHandle,
+                replacing: Boolean,
+            ) {
+                if (replacing) return
+                for (pkg in packageNames) {
+                    mainHandler.postDelayed({
+                        if (launcherApps?.getActivityList(pkg, user).isNullOrEmpty()) {
+                            refresh()
+                        }
+                    }, Config.PACKAGE_ABSENCE_DELAY_MS)
+                }
             }
         }
 
-    fun start() {
-        if (!callbackRegistered) {
-            launcherApps.registerCallback(callback)
-            callbackRegistered = true
-        }
-        refreshAll()
+    init {
+        refresh()
+        launcherApps?.registerCallback(callback, mainHandler)
     }
 
-    fun stop() {
-        if (callbackRegistered) {
-            launcherApps.unregisterCallback(callback)
-            callbackRegistered = false
-        }
+    fun addListener(listener: Listener) {
+        listeners.add(listener)
     }
 
-    fun refreshAll() {
-        val list = launcherApps.getActivityList(null, user)
-        if (list.isEmpty()) {
-            return
-        }
-        val grouped = list
-            .filter { it.applicationInfo.packageName != ownPackageName }
-            .groupBy { it.applicationInfo.packageName }
-            .map { (pkg, activities) ->
-                val label = activities.first().label?.toString() ?: pkg
-                InstalledApp(
-                    packageName = pkg,
-                    label = label,
-                    activities = activities.map { LauncherActivity(it.componentName.className) },
-                    available = true,
+    fun removeListener(listener: Listener) {
+        listeners.remove(listener)
+    }
+
+    fun getLaunchable(): List<AppEntry> = entries
+
+    fun launchablePackages(): Set<String> = entries.map { it.packageName }.toSet()
+
+    fun findEntry(packageName: String): AppEntry? = entries.firstOrNull { it.packageName == packageName }
+
+    fun refresh() {
+        entries = loadEntries()
+        listeners.forEach { it.onCatalogChanged() }
+    }
+
+    private fun loadEntries(): List<AppEntry> {
+        val user = Process.myUserHandle()
+        val fromLauncher = launcherApps?.getActivityList(null, user).orEmpty()
+        val mapped =
+            if (fromLauncher.isNotEmpty()) {
+                fromLauncher.map { info ->
+                    AppEntry(
+                        packageName = info.applicationInfo.packageName,
+                        label = info.label.toString(),
+                        activityClassName = info.name,
+                        activityInfo = info,
+                    )
+                }
+            } else {
+                fallbackFromPackageManager()
+            }
+        return mapped
+            .filter { it.packageName != BuildConfig.APPLICATION_ID }
+            .distinctBy { it.packageName }
+            .sortedBy { it.sortKey }
+    }
+
+    /**
+     * On newer devices [LauncherApps.getActivityList] can return empty until Plain holds the HOME
+     * role. PackageManager still exposes launcher activities via manifest queries.
+     */
+    private fun fallbackFromPackageManager(): List<AppEntry> {
+        val intent =
+            Intent(Intent.ACTION_MAIN).addCategory(Intent.CATEGORY_LAUNCHER)
+        val resolved =
+            if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.TIRAMISU) {
+                packageManager.queryIntentActivities(
+                    intent,
+                    PackageManager.ResolveInfoFlags.of(PackageManager.MATCH_ALL.toLong()),
                 )
+            } else {
+                @Suppress("DEPRECATION")
+                packageManager.queryIntentActivities(intent, PackageManager.MATCH_ALL)
             }
-            .sortedBy { it.label.lowercase() }
-        _apps.value = grouped
-
-        if (packagePresence.reconciliationEnabled) {
-            scope.launch {
-                reconcileStoredPackages(grouped.map { it.packageName }.toSet())
-            }
-        }
-    }
-
-    override fun activitiesFor(packageName: String): List<LauncherActivity> {
-        return launcherApps.getActivityList(packageName, user).map {
-            LauncherActivity(it.componentName.className)
-        }
-    }
-
-    private fun refreshPackage(packageName: String) {
-        val activities = launcherApps.getActivityList(packageName, user)
-        if (activities.isEmpty()) {
-            removePackage(packageName)
-            return
-        }
-        val label = activities.first().label?.toString() ?: packageName
-        val app = InstalledApp(
-            packageName = packageName,
-            label = label,
-            activities = activities.map { LauncherActivity(it.componentName.className) },
-            available = true,
-        )
-        _apps.value = (_apps.value.filter { it.packageName != packageName } + app)
-            .sortedBy { it.label.lowercase() }
-    }
-
-    private fun removePackage(packageName: String) {
-        _apps.value = _apps.value.filter { it.packageName != packageName }
-    }
-
-    private fun markUnavailable(packages: Set<String>, unavailable: Boolean) {
-        _apps.value = _apps.value.map { app ->
-            if (app.packageName in packages) app.copy(available = !unavailable) else app
+        return resolved.mapNotNull { ri ->
+            val ai = ri.activityInfo ?: return@mapNotNull null
+            val pkg = ai.packageName ?: return@mapNotNull null
+            val label = ri.loadLabel(packageManager)?.toString() ?: pkg
+            AppEntry(
+                packageName = pkg,
+                label = label,
+                activityClassName = ai.name,
+                activityInfo = null,
+            )
         }
     }
 }

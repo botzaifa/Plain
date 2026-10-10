@@ -1,0 +1,13 @@
+<?xml version="1.0" encoding="utf-8"?>
+<resources>
+    <color name="plain_black">#FF000000</color>
+    <color name="plain_white">#FFFFFFFF</color>
+    <color name="plain_gray">#FFAAAAAA</color>
+    <color name="plain_accent">#FFCCCCCC</color>
+    <color name="plain_warning">#FFFFCC66</color>
+    <color name="plain_surface">#FF141414</color>
+    <color name="plain_surface_elevated">#FF1E1E1E</color>
+    <color name="plain_border">#FF333333</color>
+    <color name="plain_button_secondary">#FF2A2A2A</color>
+    <color name="plain_error">#FFFF6B6B</color>
+</resources>
