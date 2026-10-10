@@ -11,6 +11,7 @@ import app.plain.launcher.PlainApp
 import app.plain.launcher.R
 import app.plain.launcher.auth.UnlockState
 import app.plain.launcher.core.Config
+import app.plain.launcher.core.InteractionPackages
 import app.plain.launcher.core.SettingsPackages
 import app.plain.launcher.policy.EnforcementAction
 import app.plain.launcher.policy.EnforcementPolicy
@@ -51,7 +52,10 @@ class GateAccessibilityService : AccessibilityService() {
         try {
             when (event.eventType) {
                 AccessibilityEvent.TYPE_WINDOW_STATE_CHANGED -> evaluate(event.packageName?.toString())
-                AccessibilityEvent.TYPE_WINDOWS_CHANGED -> evaluatePictureInPicture()
+                AccessibilityEvent.TYPE_WINDOWS_CHANGED -> {
+                    evaluatePictureInPicture()
+                    evaluate(rootInActiveWindow?.packageName?.toString())
+                }
             }
         } catch (_: Exception) {
             // Window queries can throw on some builds; avoid killing the service.
@@ -75,6 +79,9 @@ class GateAccessibilityService : AccessibilityService() {
             }
             if (state != UnlockState.TEMP_UNLOCKED) {
                 tempWarnShown = false
+            }
+            if (state == UnlockState.LOCKED) {
+                evaluate(rootInActiveWindow?.packageName?.toString())
             }
         } catch (_: Exception) {
             // Keep the service alive if app state is temporarily unavailable.
@@ -124,6 +131,7 @@ class GateAccessibilityService : AccessibilityService() {
                 allowSettingsUntilA11yOn =
                     app.auth.isSetupComplete() && instance == null,
                 settingsPackages = SettingsPackages.known,
+                interactionPackages = InteractionPackages.known,
             )
         return action == EnforcementAction.SEND_HOME
     }

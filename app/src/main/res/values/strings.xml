@@ -30,7 +30,10 @@
     <string name="new_recovery_code">New recovery code</string>
     <string name="restore_defaults">Restore default Basic apps</string>
     <string name="open_accessibility">Open accessibility settings</string>
-    <string name="open_home_settings">Home settings</string>
+    <string name="open_home_settings">Default home app</string>
+    <string name="black_wallpaper">Set black wallpaper</string>
+    <string name="black_wallpaper_applied">Wallpaper set to black</string>
+    <string name="black_wallpaper_failed">Could not set wallpaper</string>
     <string name="open_app_info">App info</string>
     <string name="wizard_welcome_subtitle">Set passwords and choose Basic apps first. You can make Plain your Home app and turn on the gate later.</string>
     <string name="wizard_done_title">You\'re set up</string>

@@ -19,6 +19,7 @@ import app.plain.launcher.enforce.A11yStatus
 import app.plain.launcher.enforce.GateAccessibilityService
 import app.plain.launcher.policy.BasicRules
 import app.plain.launcher.system.HomeRole
+import app.plain.launcher.system.WallpaperHelper
 import app.plain.launcher.unlock.RecoveryFlow
 import java.text.DateFormat
 import java.util.Date
@@ -40,7 +41,6 @@ class SettingsActivity : Activity() {
         binding.btnPasswords.setOnClickListener { startActivity(Intent(this, ChangePasswordsActivity::class.java)) }
         binding.btnRecovery.setOnClickListener { regenerateRecovery() }
         binding.btnRestore.setOnClickListener { restoreDefaults() }
-        binding.btnHome.setOnClickListener { HomeRole.launchRequest(this, REQ_HOME) }
         binding.btnA11y.setOnClickListener {
             app.adminSession.grantSystemSettingsPass()
             A11yStatus.openSettings(this)
@@ -57,6 +57,7 @@ class SettingsActivity : Activity() {
                 }
             startActivity(intent)
         }
+        binding.btnBlackWallpaper.setOnClickListener { WallpaperHelper.setSolidBlack(this) }
         refreshStatus()
     }
 
@@ -119,8 +120,6 @@ class SettingsActivity : Activity() {
     }
 
     companion object {
-        private const val REQ_HOME = 42
-
         fun intent(context: Context): Intent = Intent(context, SettingsActivity::class.java)
     }
 }

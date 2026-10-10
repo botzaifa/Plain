@@ -98,13 +98,6 @@
             android:text="@string/settings_section_system" />
 
         <Button
-            android:id="@+id/btnHome"
-            style="@style/PlainListButton"
-            android:layout_width="match_parent"
-            android:layout_height="wrap_content"
-            android:text="@string/set_as_home" />
-
-        <Button
             android:id="@+id/btnA11y"
             style="@style/PlainListButton"
             android:layout_width="match_parent"
@@ -124,5 +117,12 @@
             android:layout_width="match_parent"
             android:layout_height="wrap_content"
             android:text="@string/open_app_info" />
+
+        <Button
+            android:id="@+id/btnBlackWallpaper"
+            style="@style/PlainListButton"
+            android:layout_width="match_parent"
+            android:layout_height="wrap_content"
+            android:text="@string/black_wallpaper" />
     </LinearLayout>
 </ScrollView>

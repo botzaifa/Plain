@@ -16,7 +16,7 @@ class ChangePasswordsActivity : Activity() {
         super.onCreate(savedInstanceState)
         binding = ActivityChangePasswordsBinding.inflate(layoutInflater)
         setContentView(binding.root)
-        EdgeInsets.applySystemBars(binding.changePasswordsRoot)
+        EdgeInsets.applySystemBarsAndIme(binding.changePasswordsRoot)
         binding.btnSave.setOnClickListener { save() }
     }
 

@@ -1,6 +1,8 @@
 <?xml version="1.0" encoding="utf-8"?>
 <manifest xmlns:android="http://schemas.android.com/apk/res/android">
 
+    <uses-permission android:name="android.permission.SET_WALLPAPER" />
+
     <queries>
         <intent>
             <action android:name="android.intent.action.MAIN" />
@@ -81,13 +83,15 @@
             android:name=".settings.ChangePasswordsActivity"
             android:exported="false"
             android:screenOrientation="portrait"
-            android:theme="@style/Theme.Plain" />
+            android:theme="@style/Theme.Plain"
+            android:windowSoftInputMode="adjustResize" />
 
         <activity
             android:name=".setup.WizardActivity"
             android:exported="false"
             android:screenOrientation="portrait"
-            android:theme="@style/Theme.Plain" />
+            android:theme="@style/Theme.Plain"
+            android:windowSoftInputMode="adjustResize" />
 
         <service
             android:name=".enforce.GateAccessibilityService"

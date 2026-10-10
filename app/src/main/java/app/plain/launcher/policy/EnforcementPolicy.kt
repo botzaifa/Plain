@@ -19,6 +19,7 @@ object EnforcementPolicy {
         enforcementPaused: Boolean,
         allowSettingsUntilA11yOn: Boolean = false,
         settingsPackages: Set<String> = emptySet(),
+        interactionPackages: Set<String> = emptySet(),
     ): EnforcementAction {
         if (!enforcementEnabled || enforcementPaused) return EnforcementAction.ALLOW
         if (foregroundPkg.isNullOrBlank()) return EnforcementAction.ALLOW
@@ -27,8 +28,8 @@ object EnforcementPolicy {
             return EnforcementAction.ALLOW
         }
         if (alwaysAllowed.contains(foregroundPkg)) return EnforcementAction.ALLOW
-        if (!launchable.contains(foregroundPkg)) return EnforcementAction.ALLOW
         if (basic.contains(foregroundPkg)) return EnforcementAction.ALLOW
+        if (interactionPackages.contains(foregroundPkg)) return EnforcementAction.ALLOW
         if (state == UnlockState.FULL_UNLOCKED) return EnforcementAction.ALLOW
         if (state == UnlockState.TEMP_UNLOCKED) return EnforcementAction.ALLOW
         return EnforcementAction.SEND_HOME

@@ -19,8 +19,9 @@ import app.plain.launcher.databinding.ActivityWizardBinding
 import app.plain.launcher.home.HomeActivity
 import app.plain.launcher.policy.BasicRules
 import app.plain.launcher.settings.BasicMoveCallback
-import app.plain.launcher.settings.BasicPickerAdapter
 import androidx.recyclerview.widget.ItemTouchHelper
+import app.plain.launcher.settings.BasicPickerAdapter
+
 class WizardActivity : Activity() {
     private lateinit var binding: ActivityWizardBinding
     private val app get() = PlainApp.instance
@@ -42,6 +43,11 @@ class WizardActivity : Activity() {
         wireRecovery()
         wireBasic()
         wireDone()
+        setupPasswordScrollInsets()
+    }
+
+    private fun setupPasswordScrollInsets() {
+        EdgeInsets.applyImePaddingBottom(findViewById(R.id.wizardPasswordsScroll))
     }
 
     private fun wireWelcome() {
@@ -123,6 +129,7 @@ class WizardActivity : Activity() {
                     .map { BasicPickerAdapter.Row(it, false) }
         basicAdapter = BasicPickerAdapter(dialer)
         list.layoutManager = LinearLayoutManager(this)
+        list.itemAnimator = BasicPickerAdapter.createItemAnimator()
         list.adapter = basicAdapter
         basicAdapter?.setData(rows)
         basicAdapter?.let {

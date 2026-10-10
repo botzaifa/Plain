@@ -61,6 +61,22 @@ class EnforcementPolicyTest {
     }
 
     @Test
+    fun nonLaunchableSentHomeWhenLocked() {
+        val action =
+            EnforcementPolicy.decide(
+                "com.vendor.camera",
+                UnlockState.LOCKED,
+                launchable = emptySet(),
+                basic,
+                always,
+                false,
+                true,
+                false,
+            )
+        assertEquals(EnforcementAction.SEND_HOME, action)
+    }
+
+    @Test
     fun builtInAllowlistHonored() {
         val pkg = BuiltInAllowlist.packages.firstOrNull() ?: return
         val action =
