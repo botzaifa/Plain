@@ -6,14 +6,15 @@ import android.content.Context
 import android.os.Build
 
 object KeyguardHelper {
+    /**
+     * Whether the system keyguard still blocks the user. Plain uses [KeyguardManager.isKeyguardLocked]
+     * only — on some OEMs (e.g. Vivo Android 10) [KeyguardManager.isDeviceLocked] stays true after the
+     * PIN was entered, which would leave Home invisible forever if OR'd with keyguard state.
+     */
     fun isLocked(context: Context): Boolean {
         val km = context.getSystemService(KeyguardManager::class.java) ?: return false
-        return if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.M) {
-            km.isDeviceLocked || km.isKeyguardLocked
-        } else {
-            @Suppress("DEPRECATION")
-            km.isKeyguardLocked
-        }
+        @Suppress("DEPRECATION")
+        return km.isKeyguardLocked
     }
 
     fun whenUnlocked(
@@ -33,6 +34,18 @@ object KeyguardHelper {
                 object : KeyguardManager.KeyguardDismissCallback() {
                     override fun onDismissSucceeded() {
                         onUnlocked()
+                    }
+
+                    override fun onDismissError() {
+                        if (!isLocked(activity)) {
+                            onUnlocked()
+                        }
+                    }
+
+                    override fun onDismissCancelled() {
+                        if (!isLocked(activity)) {
+                            onUnlocked()
+                        }
                     }
                 },
             )
