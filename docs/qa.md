@@ -14,7 +14,7 @@
 - [ ] TEMP expires, FULL until Lock, reboot ends TEMP not FULL
 - [ ] Long-press clock → Admin (no Admin tile on Home)
 - [ ] Device lock screen shown before Home when keyguard is active
-- [ ] Picture-in-picture dismissed for gated apps while locked
+- [ ] Picture-in-picture: optional manual check (service does not retrieve window content; dismissal may be inert on some builds)
 - [ ] Recovery code resets admin only
 - [ ] LOCKED: gated app from notification / Recents → Home
 - [ ] Alarm dismiss with Clock not Basic

@@ -38,7 +38,13 @@ class AuthRepository(
     fun setAdminPassword(admin: CharArray) {
         val iterations = store.getInt(KEY_ITERATIONS, Config.PBKDF2_ITER_MIN)
         store.putString(KEY_HASH_ADMIN, PasswordHasher.hash(admin, iterations).serialize())
+        if (!admin.all { it.isDigit() }) {
+            store.putBoolean(KEY_PASSWORDS_NUMERIC, false)
+        }
     }
+
+    /** True when [admin] does not match temporary, full, or the current admin password. */
+    fun validateNewAdminDistinct(admin: CharArray): Boolean = verifyPassword(admin) == PasswordLevel.NONE
 
     fun setRecoveryCode(code: String, iterations: Int? = null) {
         val iter = iterations ?: store.getInt(KEY_ITERATIONS, Config.PBKDF2_ITER_MIN)

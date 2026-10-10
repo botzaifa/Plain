@@ -1,10 +1,14 @@
 # Plain
 
-Plain is a standalone Android launcher for assistive access and digital focus. Home shows a few **Basic** apps as large tiles. Every other app is **gated** behind a password. A minimal accessibility service sends you back Home when a locked app opens in the foreground.
+Plain is a standalone Android launcher for assistive access and digital focus. Home shows a few **Basic** apps as large tiles. Every other **launchable** app is **gated** behind a password. A minimal accessibility service sends you back Home when a locked launchable app opens in the foreground.
 
 Built with Kotlin and Android Views (no Compose). Package: `app.plain.launcher`.
 
 **Made for:** digital-detox phones, calm setups for older adults, and restricted phones for children with separate passwords.
+
+![Plain icon](assets/plain-icon.svg)
+
+License: [MIT](LICENSE). Suggested GitHub topics: `android`, `launcher`, `digital-wellbeing`, `accessibility`, `kotlin`.
 
 ---
 
@@ -14,7 +18,7 @@ Built with Kotlin and Android Views (no Compose). Package: `app.plain.launcher`.
 
 ```bash
 git clone https://github.com/botzaifa/Plain.git
-cd plain
+cd Plain
 ./gradlew assembleDebug
 ```
 
@@ -27,6 +31,8 @@ For a release build:
 ```
 
 Release output: `app/build/outputs/apk/release/app-release.apk`.
+
+Pre-built APKs may be attached to [GitHub Releases](https://github.com/botzaifa/Plain/releases) when published.
 
 ### On the phone
 
@@ -106,7 +112,7 @@ Plain does not replace your PIN, pattern, or fingerprint. Android shows the syst
 
 ### Admin (hidden entry)
 
-**Long-press the clock** on Home → enter **admin password**.
+**Long-press the clock** on Home → enter **admin password**. If you forgot it, tap **Forgot password?** on that dialog and enter your **recovery code** to set a new admin password (see [Recovery](#recovery)).
 
 | Admin action | Purpose |
 |--------------|---------|
@@ -137,6 +143,7 @@ Wrong attempts: after 5 failures, lockout escalates (30 s → 1 min → 5 min �
 
 ## Recovery
 
+- **Forgot admin password** — **Long-press the clock** → **Forgot password?** → enter your recovery code → set and confirm a **new admin password** (must differ from temporary, full, and the old admin password). A new recovery code is shown once.
 - **Setup code** — shown once in the wizard; store offline in a safe place.
 - **Rotate code** — Admin → **New recovery code** (shown once; the previous code stops working).
 - **Last resort** — boot safe mode, then clear Plain app data (wipes all Plain settings).
@@ -145,9 +152,11 @@ Wrong attempts: after 5 failures, lockout escalates (30 s → 1 min → 5 min �
 
 ## What stays allowed while locked
 
-Plain itself, the **default dialer**, the **default clock/alarm app**, apps that handle **HOME** (recents / OEM launchers), **enabled keyboards**, and a small set of **system UI packages** needed for share/pickers from Basic apps. Everything else that Plain can see in the foreground should be sent Home when the gate is running and you are locked.
+While locked, Plain sends Home only for **launchable** apps that are not Basic and not covered by unlock. **Non-launchable** foreground packages (in-call UI, keyboards, document pickers, Google Play services dialogs, and similar system helpers) are left alone so cheap OEM phones stay usable.
 
-Gated apps may flash briefly before Home. Picture-in-picture for non-Basic apps is dismissed when enforcement applies.
+Also allowed: Plain itself, the **default dialer**, the **default clock/alarm app**, apps that handle **HOME** (recents / OEM launchers), **enabled keyboards** (when the OS exposes them), and a small set of **interaction packages** for share flows from Basic apps.
+
+Gated launchable apps may flash briefly before Home.
 
 ---
 
@@ -163,7 +172,7 @@ Gated apps may flash briefly before Home. Picture-in-picture for non-Basic apps 
 ## Known limits
 
 - Not tamper-proof: safe mode, adb, power menu, factory reset bypass Plain.
-- Apps without launcher icons are not listed under gated apps but can still be blocked in the foreground when locked.
+- Apps without launcher icons are not listed under gated apps and are not sent Home by the gate (they are not launchable).
 - Split screen and work profiles are unsupported.
 - Extra third-party HOME apps may remain reachable from Recents.
 - Hardware shortcuts (camera, etc.) are mitigated when the gate is **running**; if the service is off, only hiding on Home applies.

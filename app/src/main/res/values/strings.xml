@@ -2,7 +2,7 @@
 <resources>
     <string name="app_name">Plain</string>
     <string name="accessibility_service_label">Plain gate</string>
-    <string name="accessibility_service_description">Sends you Home when a locked app opens and closes picture-in-picture for gated apps. Reads only which app is in front, never screen content.</string>
+    <string name="accessibility_service_description">Sends you Home when a locked, launchable app opens in front. Reads only which app is in front, never screen content.</string>
     <string name="more">More apps</string>
     <string name="lock">Lock</string>
     <string name="lock_with_time">Lock (%1$s)</string>
@@ -65,4 +65,6 @@
     <string name="gated_apps_title">Gated apps</string>
     <string name="gated_apps_subtitle">Alphabetical. Opens while you are unlocked.</string>
     <string name="recovery_code_dialog_subtitle">Format: XXXX-XXXX-XXXX</string>
+    <string name="password_confirm_mismatch">Confirmation does not match</string>
+    <string name="recovery_admin_must_differ">Use a new admin password that is different from your temporary, full, and current admin passwords.</string>
 </resources>

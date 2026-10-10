@@ -29,6 +29,7 @@ object EnforcementPolicy {
         }
         if (alwaysAllowed.contains(foregroundPkg)) return EnforcementAction.ALLOW
         if (basic.contains(foregroundPkg)) return EnforcementAction.ALLOW
+        if (!launchable.contains(foregroundPkg)) return EnforcementAction.ALLOW
         if (interactionPackages.contains(foregroundPkg)) return EnforcementAction.ALLOW
         if (state == UnlockState.FULL_UNLOCKED) return EnforcementAction.ALLOW
         if (state == UnlockState.TEMP_UNLOCKED) return EnforcementAction.ALLOW

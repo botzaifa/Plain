@@ -67,22 +67,56 @@ object RecoveryFlow {
     }
 
     private fun promptNewAdmin(activity: Activity) {
-        showSingleInput(
-            activity,
-            title = activity.getString(R.string.new_admin_password),
-            subtitle = activity.getString(R.string.password_admin_hint),
-            inputType = InputType.TYPE_CLASS_TEXT or InputType.TYPE_TEXT_VARIATION_PASSWORD,
-        ) { value ->
-            val pwd = value.toCharArray()
+        val app = PlainApp.instance
+        val view = LayoutInflater.from(activity).inflate(R.layout.dialog_admin_password_recovery, null)
+        view.findViewById<TextView>(R.id.dialogTitle).setText(R.string.new_admin_password)
+        view.findViewById<TextView>(R.id.dialogSubtitle).setText(R.string.password_admin_hint)
+        val admin1 = view.findViewById<EditText>(R.id.admin1)
+        val admin2 = view.findViewById<EditText>(R.id.admin2)
+        val inputType = InputType.TYPE_CLASS_TEXT or InputType.TYPE_TEXT_VARIATION_PASSWORD
+        admin1.inputType = inputType
+        admin2.inputType = inputType
+        val dialog =
+            AlertDialog.Builder(activity, R.style.Theme_Plain_Dialog)
+                .setView(view)
+                .create()
+        view.findViewById<Button>(R.id.btnCancel).setOnClickListener { dialog.dismiss() }
+        view.findViewById<Button>(R.id.btnConfirm).setOnClickListener {
+            val a1 = admin1.text?.toString().orEmpty()
+            val a2 = admin2.text?.toString().orEmpty()
+            if (a1 != a2) {
+                AlertDialog.Builder(activity, R.style.Theme_Plain_Dialog)
+                    .setMessage(R.string.password_confirm_mismatch)
+                    .setPositiveButton(android.R.string.ok, null)
+                    .show()
+                return@setOnClickListener
+            }
+            val pwd = a1.toCharArray()
             if (pwd.size < Config.MIN_LEN_ADMIN) {
                 AlertDialog.Builder(activity, R.style.Theme_Plain_Dialog)
                     .setMessage(activity.getString(R.string.password_admin_hint))
                     .setPositiveButton(android.R.string.ok, null)
                     .show()
-                return@showSingleInput
+                return@setOnClickListener
             }
-            finishRecovery(activity, pwd)
+            dialog.dismiss()
+            val progress = ProgressDialog.show(activity, null, "Loading…", true, false)
+            app.backgroundExecutor.execute {
+                val distinct = app.auth.validateNewAdminDistinct(pwd)
+                activity.runOnUiThread {
+                    progress.dismiss()
+                    if (!distinct) {
+                        AlertDialog.Builder(activity, R.style.Theme_Plain_Dialog)
+                            .setMessage(R.string.recovery_admin_must_differ)
+                            .setPositiveButton(android.R.string.ok, null)
+                            .show()
+                        return@runOnUiThread
+                    }
+                    finishRecovery(activity, pwd)
+                }
+            }
         }
+        dialog.show()
     }
 
     private fun finishRecovery(activity: Activity, admin: CharArray) {

@@ -28,6 +28,7 @@ import app.plain.launcher.settings.SettingsActivity
 import app.plain.launcher.setup.WizardActivity
 import app.plain.launcher.system.HomeRole
 import app.plain.launcher.unlock.PasswordPrompt
+import app.plain.launcher.unlock.RecoveryFlow
 import app.plain.launcher.unlock.PromptMode
 import app.plain.launcher.system.KeyguardHelper
 import java.util.Locale
@@ -75,12 +76,17 @@ class HomeActivity : Activity(), AppCatalog.Listener {
             updateLockUi()
         }
         binding.clockContainer.setOnLongClickListener {
-            PasswordPrompt.show(this, PromptMode.ADMIN_ONLY, onSuccess = {
-                if (it == PasswordLevel.ADMIN) {
-                    app.adminSession.start()
-                    startActivity(SettingsActivity.intent(this))
-                }
-            })
+            PasswordPrompt.show(
+                this,
+                PromptMode.ADMIN_ONLY,
+                onSuccess = {
+                    if (it == PasswordLevel.ADMIN) {
+                        app.adminSession.start()
+                        startActivity(SettingsActivity.intent(this))
+                    }
+                },
+                onRecovery = { RecoveryFlow.start(this) },
+            )
             true
         }
         app.catalog.addListener(this)

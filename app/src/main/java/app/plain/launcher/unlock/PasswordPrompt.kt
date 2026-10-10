@@ -56,6 +56,7 @@ object PasswordPrompt {
             PromptMode.ADMIN_ONLY -> {
                 title.setText(R.string.enter_admin_password)
                 subtitle.setText(R.string.password_dialog_admin_subtitle)
+                btnForgot.visibility = if (onRecovery != null) View.VISIBLE else View.GONE
             }
         }
 
