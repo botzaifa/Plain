@@ -1,13 +1,105 @@
-*.iml
+# --- Local machine / secrets (never commit) ---
+local.properties
+*.keystore
+*.jks
+*.p12
+*.pem
+.env
+.env.*
+!.env.example
+
+# --- Gradle ---
 .gradle/
-/local.properties
-/.idea/
-.DS_Store
-/build/
-/app/build/
-/captures/
-.externalNativeBuild/
-.cxx/
+**/build/
+!gradle/wrapper/gradle-wrapper.jar
+gradle-app.setting
+.gradletasknamecache
+
+# --- Android build outputs ---
 *.apk
 *.ap_
 *.aab
+*.aar
+output.json
+**/outputs/
+**/intermediates/
+**/generated/
+**/tmp/
+captures/
+.externalNativeBuild/
+.cxx/
+*.so
+*.dex
+
+# --- Native / NDK (if added later) ---
+**/obj/
+**/.ndk/
+
+# --- Kotlin / KSP / Compose compiler ---
+.kotlin/
+**/ksp/
+**/compose_compiler/
+**/build/generated/ksp/
+
+# --- Room: keep exported schemas in app/schemas/ (do not ignore) ---
+
+# --- Baseline profiles / perf (optional modules) ---
+**/baselineProfiles/**/generated/
+*.prof
+*.profm
+
+# --- Tests / coverage / reports ---
+**/test-results/
+**/reports/
+**/androidTest-results/
+*.ec
+*.exec
+coverage/
+.nyc_output/
+
+# --- IDE: Android Studio / IntelliJ ---
+.idea/
+*.iml
+*.ipr
+*.iws
+out/
+.idea_modules/
+
+# --- IDE: VS Code / Cursor (local editor state only) ---
+.vscode/
+!.vscode/extensions.json
+!.vscode/settings.json.example
+
+# --- OS ---
+.DS_Store
+.DS_Store?
+._*
+.Spotlight-V100
+.Trashes
+Thumbs.db
+ehthumbs.db
+Desktop.ini
+
+# --- Logs / crash / profiling ---
+*.log
+*.hprof
+*.trace
+lint-results*.xml
+lint-results*.html
+
+# --- Packaging / misc ---
+*.swp
+*~
+*.orig
+*.rej
+*.bak
+
+# --- Fastlane / Play (if added later) ---
+fastlane/report.xml
+fastlane/Preview.html
+fastlane/screenshots/**/*.png
+fastlane/test_output/
+
+# --- Firebase / Google Services (if added later; usually secret) ---
+google-services.json
+GoogleService-Info.plist
