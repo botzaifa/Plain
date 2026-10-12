@@ -90,7 +90,7 @@ class GateAccessibilityService : AccessibilityService() {
 
     /** Best-effort only: [canRetrieveWindowContent] is false, so [windows] may be empty on some builds. */
     private fun evaluatePictureInPicture() {
-        if (Build.VERSION.SDK_INT < Build.VERSION_CODES.N) return
+        if (Build.VERSION.SDK_INT < Build.VERSION_CODES.O) return
         val snapshot =
             try {
                 windows?.toList().orEmpty()

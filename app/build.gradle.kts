@@ -1,5 +1,19 @@
+import java.io.FileInputStream
+import java.util.Properties
+
 plugins {
     alias(libs.plugins.android.application)
+}
+
+val signingProperties = Properties().apply {
+    val propertiesFile = File(
+        System.getProperty("user.home"),
+        ".config/plain/signing.properties"
+    )
+    require(propertiesFile.exists()) {
+        "Missing signing properties: ${propertiesFile.absolutePath}"
+    }
+    FileInputStream(propertiesFile).use { load(it) }
 }
 
 android {
@@ -15,6 +29,21 @@ android {
         testInstrumentationRunner = "androidx.test.runner.AndroidJUnitRunner"
     }
 
+    signingConfigs {
+        create("release") {
+            storeFile = file(
+                signingProperties.getProperty("storeFile")
+                    ?: error("Missing storeFile")
+            )
+            storePassword = signingProperties.getProperty("storePassword")
+                ?: error("Missing storePassword")
+            keyAlias = signingProperties.getProperty("keyAlias")
+                ?: error("Missing keyAlias")
+            keyPassword = signingProperties.getProperty("keyPassword")
+                ?: error("Missing keyPassword")
+        }
+    }
+
     buildTypes {
         release {
             isMinifyEnabled = true
@@ -23,7 +52,7 @@ android {
                 getDefaultProguardFile("proguard-android-optimize.txt"),
                 "proguard-rules.pro",
             )
-            signingConfig = signingConfigs.getByName("debug")
+            signingConfig = signingConfigs.getByName("release")
         }
     }
 

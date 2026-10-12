@@ -1,5 +1,6 @@
 # --- Local machine / secrets (never commit) ---
 local.properties
+signing.properties
 *.keystore
 *.jks
 *.p12
