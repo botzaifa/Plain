@@ -12,6 +12,40 @@ License: [MIT](LICENSE). Suggested GitHub topics: `android`, `launcher`, `digita
 
 ---
 
+## Screenshots
+
+Captured on the Android emulator (API 37). Full-resolution PNGs live in [`assets/screenshots/`](assets/screenshots/); README uses smaller previews in [`assets/screenshots/preview/`](assets/screenshots/preview/).
+
+### First-time setup (wizard)
+
+| Welcome | Passwords |
+|:---:|:---:|
+| ![Wizard welcome](assets/screenshots/preview/wizard-welcome.png) | ![Wizard passwords](assets/screenshots/preview/wizard-passwords.png) |
+
+| Recovery code | Basic apps | Done |
+|:---:|:---:|:---:|
+| ![Wizard recovery](assets/screenshots/preview/wizard-recovery.png) | ![Wizard basic apps](assets/screenshots/preview/wizard-basic-apps.png) | ![Wizard done](assets/screenshots/preview/wizard-done.png) |
+
+### Home and setup cards
+
+When Home role or Plain gate still needs attention, a setup card appears under the clock (not a yellow banner).
+
+| Default Home app | Plain gate off |
+|:---:|:---:|
+| ![Choose Home app card](assets/screenshots/preview/home-setup-card.png) | ![Open Accessibility card](assets/screenshots/preview/home-setup-a11y.png) |
+
+**Home when everything is configured** — clock, Basic tiles, **More apps**, and **Lock**:
+
+![Plain Home](assets/screenshots/preview/home-daily.png)
+
+### Unlock and Admin
+
+| More apps password | Gated app list | Admin settings |
+|:---:|:---:|:---:|
+| ![Password dialog](assets/screenshots/preview/password-dialog.png) | ![Gated apps](assets/screenshots/preview/gated-apps.png) | ![Admin settings](assets/screenshots/preview/admin-settings.png) |
+
+---
+
 ## Install
 
 ### From source
@@ -67,17 +101,24 @@ For Plain to block gated apps and shortcuts (for example double-press power → 
 
 ### 1. Default Home app
 
-- On **Home**, if you see a yellow banner (*Plain is not your Home app*), tap it and choose **Plain** as the default launcher.
+- On **Home**, if you see the setup card (*Plain isn't your Home app*), tap **Choose Home app** and select **Plain** as the default launcher.
 - Or: **long-press the clock** → admin password → **Default home app** → select Plain.
 
 Press the system **Home** button and confirm Plain stays as Home.
 
 ### 2. Plain gate (accessibility)
 
-- Tap the yellow banner if it says accessibility is off, or open **Admin → Open accessibility settings**.
+- Use the setup card on Home if Plain gate is off, or open **Admin → Open accessibility settings**.
 - Enable **Plain gate**.
-- On **Android 13+** sideloads: **Admin → App info → Allow restricted settings** (or the equivalent on your OEM), then enable the service again.
-- If Settings shows *malfunctioning*, toggle the service off and on, ensure battery is unrestricted (step 3), and reinstall the latest APK.
+
+**If you see “App was denied access” or “Controlled by restricted setting”** (common on Android 13+ when Plain is sideloaded):
+
+1. In Plain: **Admin → App info** (or tap **Show steps** on the Home setup card).
+2. Open the **⋮** menu (top right; some phones say **More**).
+3. Tap **Allow restricted settings** and confirm.
+4. Go back to **Accessibility → Downloaded apps → Plain gate** and turn it on.
+
+Plain cannot bypass this screen; only that App info step unlocks the toggle. If Settings shows *malfunctioning*, toggle the service off and on, ensure battery is unrestricted (step 3), and reinstall the latest APK.
 
 ### 3. Battery (OEM)
 
@@ -100,7 +141,7 @@ Set Plain to **Unrestricted** / **Don't optimize** battery use. See [dontkillmya
   - **Full** — gated apps stay open until you tap **Lock**; survives reboot.
   - **Admin** — same as full unlock for apps, plus Admin access if you long-press the clock afterward.
 - **Lock** — appears after an unlock; tap to lock again immediately.
-- **Yellow banner** — Home role, accessibility, or loop-guard warnings; tap when indicated.
+- **Setup card** — under the clock when Home role or Plain gate still needs attention; use the button on the card.
 
 ### Gated apps
 

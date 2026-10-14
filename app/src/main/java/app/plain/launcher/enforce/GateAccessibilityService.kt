@@ -33,7 +33,11 @@ class GateAccessibilityService : AccessibilityService() {
         super.onServiceConnected()
         instance = this
         lastConnectedElapsed = SystemClock.elapsedRealtime()
-        PlainApp.instance.refreshAlwaysAllowed()
+        try {
+            PlainApp.instance.refreshAlwaysAllowed()
+        } catch (_: Exception) {
+            // Keep service alive if app state is temporarily unavailable.
+        }
         mainHandler.post(tickRunnable)
     }
 

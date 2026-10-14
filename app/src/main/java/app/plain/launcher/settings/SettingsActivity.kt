@@ -15,7 +15,9 @@ import app.plain.launcher.auth.RecoveryCode
 import app.plain.launcher.core.EdgeInsets
 import app.plain.launcher.databinding.ActivitySettingsBinding
 import app.plain.launcher.enforce.A11yHealth
+import app.plain.launcher.enforce.A11ySetupFlow
 import app.plain.launcher.enforce.A11yStatus
+import app.plain.launcher.enforce.RestrictedSettingsHelper
 import app.plain.launcher.enforce.GateAccessibilityService
 import app.plain.launcher.policy.BasicRules
 import app.plain.launcher.system.HomeRole
@@ -43,7 +45,7 @@ class SettingsActivity : Activity() {
         binding.btnRestore.setOnClickListener { restoreDefaults() }
         binding.btnA11y.setOnClickListener {
             app.adminSession.grantSystemSettingsPass()
-            A11yStatus.openSettings(this)
+            A11ySetupFlow.start(this)
         }
         binding.btnHomeSettings.setOnClickListener {
             app.adminSession.grantSystemSettingsPass()
@@ -79,12 +81,19 @@ class SettingsActivity : Activity() {
                 A11yHealth.ENABLED_BUT_DEAD -> "enabled, not running"
             }
         binding.statusText.text = "Home: $home\nAccessibility: $a11y\nVersion ${BuildConfig.VERSION_NAME}"
+        val warnings = mutableListOf<String>()
+        if (RestrictedSettingsHelper.needsAllowRestrictedSettings(this)) {
+            warnings.add(getString(R.string.restricted_settings_admin_hint))
+        }
         val tripTime = app.store.getLong(GateAccessibilityService.KEY_LOOP_TRIP_TIME, 0L)
         val tripPkg = app.store.getString(GateAccessibilityService.KEY_LOOP_TRIP_PKG, null)
         if (tripTime > 0L) {
             val whenStr = DateFormat.getDateTimeInstance().format(Date(tripTime))
+            warnings.add(getString(R.string.loop_guard_warning, whenStr, tripPkg ?: "?"))
+        }
+        if (warnings.isNotEmpty()) {
             binding.warningText.visibility = View.VISIBLE
-            binding.warningText.text = getString(R.string.loop_guard_warning, whenStr, tripPkg ?: "?")
+            binding.warningText.text = warnings.joinToString("\n\n")
         } else {
             binding.warningText.visibility = View.GONE
         }

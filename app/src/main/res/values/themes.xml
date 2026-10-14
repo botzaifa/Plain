@@ -29,6 +29,18 @@
         <item name="android:lineSpacingExtra">4dp</item>
     </style>
 
+    <style name="PlainSetupNoticeTitle">
+        <item name="android:textSize">17sp</item>
+        <item name="android:textColor">@color/plain_white</item>
+        <item name="android:fontFamily">sans-serif-medium</item>
+    </style>
+
+    <style name="PlainSetupNoticeBody">
+        <item name="android:textSize">14sp</item>
+        <item name="android:textColor">@color/plain_gray</item>
+        <item name="android:lineSpacingExtra">3dp</item>
+    </style>
+
     <style name="PlainSectionLabel">
         <item name="android:textSize">13sp</item>
         <item name="android:textColor">@color/plain_accent</item>

@@ -1,5 +1,6 @@
 package app.plain.launcher.enforce
 
+import android.app.Activity
 import android.content.ComponentName
 import android.content.Context
 import android.os.SystemClock
@@ -25,7 +26,9 @@ object A11yStatus {
 
     fun openSettings(context: Context) {
         val intent = android.content.Intent(Settings.ACTION_ACCESSIBILITY_SETTINGS)
-        intent.addFlags(android.content.Intent.FLAG_ACTIVITY_NEW_TASK)
+        if (context !is Activity) {
+            intent.addFlags(android.content.Intent.FLAG_ACTIVITY_NEW_TASK)
+        }
         context.startActivity(intent)
     }
 

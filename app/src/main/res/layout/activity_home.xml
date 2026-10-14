@@ -42,14 +42,9 @@
                 android:timeZone="default" />
         </LinearLayout>
 
-        <TextView
-            android:id="@+id/warningBanner"
-            android:layout_width="match_parent"
-            android:layout_height="wrap_content"
-            android:paddingBottom="8dp"
-            android:textColor="@color/plain_warning"
-            android:textSize="14sp"
-            android:visibility="gone" />
+        <include
+            android:id="@+id/setupNoticeInclude"
+            layout="@layout/view_home_setup_notice" />
 
         <androidx.recyclerview.widget.RecyclerView
             android:id="@+id/grid"

@@ -21,8 +21,9 @@ import app.plain.launcher.auth.PasswordLevel
 import app.plain.launcher.auth.UnlockState
 import app.plain.launcher.databinding.ActivityHomeBinding
 import app.plain.launcher.enforce.A11yHealth
+import app.plain.launcher.enforce.A11ySetupFlow
 import app.plain.launcher.enforce.A11yStatus
-import app.plain.launcher.enforce.GateAccessibilityService
+import app.plain.launcher.enforce.RestrictedSettingsHelper
 import app.plain.launcher.gated.GatedActivity
 import app.plain.launcher.settings.SettingsActivity
 import app.plain.launcher.setup.WizardActivity
@@ -203,33 +204,69 @@ class HomeActivity : Activity(), AppCatalog.Listener {
 
     private fun updateWarnings() {
         if (!HomeRole.isHomeHeld(this)) {
-            binding.warningBanner.visibility = View.VISIBLE
-            binding.warningBanner.text = getString(R.string.home_not_set)
-            binding.warningBanner.setOnClickListener { HomeRole.launchRequest(this, REQ_HOME) }
+            showSetupNotice(
+                titleRes = R.string.home_notice_title,
+                bodyRes = R.string.home_notice_body,
+                actionRes = R.string.home_notice_action,
+            ) {
+                HomeRole.launchRequest(this, REQ_HOME)
+            }
             return
         }
         when (A11yStatus.health(this)) {
             A11yHealth.OFF -> {
-                binding.warningBanner.visibility = View.VISIBLE
-                binding.warningBanner.text = getString(R.string.a11y_off)
-                binding.warningBanner.setOnClickListener {
-                    app.adminSession.grantSystemSettingsPass()
-                    A11yStatus.openSettings(this)
+                if (RestrictedSettingsHelper.needsAllowRestrictedSettings(this)) {
+                    showSetupNotice(
+                        titleRes = R.string.a11y_restricted_notice_title,
+                        bodyRes = R.string.a11y_restricted_notice_body,
+                        actionRes = R.string.a11y_restricted_notice_action,
+                    ) {
+                        app.adminSession.grantSystemSettingsPass()
+                        A11ySetupFlow.start(this)
+                    }
+                } else {
+                    showSetupNotice(
+                        titleRes = R.string.a11y_off_notice_title,
+                        bodyRes = R.string.a11y_off_notice_body,
+                        actionRes = R.string.a11y_off_notice_action,
+                    ) {
+                        app.adminSession.grantSystemSettingsPass()
+                        A11ySetupFlow.start(this)
+                    }
                 }
             }
             A11yHealth.ENABLED_BUT_DEAD -> {
-                binding.warningBanner.visibility = View.VISIBLE
-                binding.warningBanner.text = getString(R.string.a11y_dead)
-                binding.warningBanner.setOnClickListener {
+                showSetupNotice(
+                    titleRes = R.string.a11y_dead_notice_title,
+                    bodyRes = R.string.a11y_dead_notice_body,
+                    actionRes = R.string.a11y_dead_notice_action,
+                ) {
                     app.adminSession.grantSystemSettingsPass()
-                    A11yStatus.openSettings(this)
+                    A11ySetupFlow.start(this)
                 }
             }
-            A11yHealth.RUNNING -> {
-                binding.warningBanner.visibility = View.GONE
-                binding.warningBanner.setOnClickListener(null)
-            }
+            A11yHealth.RUNNING -> hideSetupNotice()
         }
+    }
+
+    private fun showSetupNotice(
+        titleRes: Int,
+        bodyRes: Int,
+        actionRes: Int,
+        onAction: () -> Unit,
+    ) {
+        val notice = binding.setupNoticeInclude
+        notice.setupNotice.visibility = View.VISIBLE
+        notice.setupNoticeTitle.setText(titleRes)
+        notice.setupNoticeBody.setText(bodyRes)
+        notice.setupNoticeAction.setText(actionRes)
+        notice.setupNoticeAction.setOnClickListener { onAction() }
+    }
+
+    private fun hideSetupNotice() {
+        val notice = binding.setupNoticeInclude
+        notice.setupNotice.visibility = View.GONE
+        notice.setupNoticeAction.setOnClickListener(null)
     }
 
     @Deprecated("Deprecated in Java")
